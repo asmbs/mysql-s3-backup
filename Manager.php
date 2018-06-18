@@ -79,10 +79,12 @@ class Manager
 
         // Check off each folder that already exists
         $objects = $this->getAllKeysInBucket();
-        foreach ($objects['Contents'] as $object) {
-            $key = str_replace('/', '', $object['Key']);
-            if (in_array($key, self::FOLDERS)) {
-                $checklist[$key] = 1;
+        if($objects->hasKey('Contents')){
+            foreach ($objects['Contents'] as $object) {
+                $key = str_replace('/', '', $object['Key']);
+                if (in_array($key, self::FOLDERS)) {
+                    $checklist[$key] = 1;
+                }
             }
         }
 
