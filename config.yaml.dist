@@ -1,0 +1,20 @@
+s3:
+  version: 'latest'
+  region: 'us-east-1'
+  credentials:
+    key: ''
+    secret: ''
+mysql:
+  host: 'localhost'
+  dbname: ''
+  username: ''
+  password: ''
+app:
+  output: true
+  bucket: ''
+  compression: 'Bzip2' # Should be 'None', 'Gzip', or 'Bzip2'
+  maximum_backup_counts:
+    yearly: 7
+    monthly: 13
+    daily: 32
+    hourly: 36

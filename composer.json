@@ -1,0 +1,24 @@
+{
+    "name": "asmbs/mysql-s3-backup",
+    "license": "MIT",
+    "description": "Manages backups of a MySQL database to Amazon S3",
+    "type": "project",
+    "authors": [
+        {
+            "name": "Max McMahon",
+            "email": "max@asmbs.org",
+            "homepage": "https://github.com/maxwellmc"
+        }
+    ],
+    "require": {
+        "php": ">=7.2",
+        "aws/aws-sdk-php": "^3.61",
+        "symfony/yaml": "^4.1",
+        "ifsnop/mysqldump-php": "2.*"
+    },
+    "autoload": {
+        "psr-4": {
+            "ASMBS\\MySQLS3Backup\\": ""
+        }
+    }
+}
