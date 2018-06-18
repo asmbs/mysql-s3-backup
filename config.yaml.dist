@@ -12,7 +12,7 @@ mysql:
 app:
   output: true
   bucket: ''
-  compression: 'Bzip2' # Should be 'None', 'Gzip', or 'Bzip2'
+  compression: 'Gzip' # Should be 'None', 'Gzip', or 'Bzip2'
   maximum_backup_counts:
     yearly: 7
     monthly: 13

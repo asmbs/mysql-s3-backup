@@ -42,7 +42,7 @@ The backup files will be created in the format `YYYY-MM-DD_HH-MM-SS.EXT`, where 
   -  `password` The password to be used by MySQL
 - `app`
   -  `output` If set to true, then information will be outputted. If set to false, the script will run silently.
-  -  `compression` The compression algorithm to use. This should be 'None', 'Gzip', or 'Bzip2'.
+  -  `compression` The compression algorithm to use. This should be 'None', 'Gzip', or 'Bzip2'. Note that bzip2 support is [not enabled by default in PHP](http://php.net/manual/en/bzip2.installation.php).
   -  `maximum_backup_counts` This is the maximum number of backups to keep based on each time period. For example, setting 'yearly' to '7' will keep **one** backup for each of the past 7 years. When a day rolls over, the most recent 'hourly' backup will be used.
     -   `yearly`
     -   `monthly`
