@@ -18,7 +18,13 @@
 
 2. Copy `config.yaml.dist` to a new file named `config.yaml` in the same directory and configure it to your needs, per the Configuration Reference below.
 
-3. Set up a single `cron` job to execute `MySQLS3Backup.php` once every hour. Using `crontab`, an example line would be:
+3. Install the dependencies:
+
+   ```
+   composer install
+   ```
+
+4. Set up a single `cron` job to execute `MySQLS3Backup.php` once every hour. Using `crontab`, an example line would be:
 
    ```
    0 * * * * php /path/to/mysql-s3-backup/MySQLS3Backup.php
