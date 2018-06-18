@@ -15,8 +15,14 @@
 ## Installation
 
 1. Create an empty, non-versioned S3 bucket. The first time that the script runs, it will create 4 folders for you ("yearly", "monthly", "daily", and "hourly").
+
 2. Copy `config.yaml.dist` to a new file named `config.yaml` in the same directory and configure it to your needs, per the Configuration Reference below.
-3. Set up a single `cron` job to execute `MySQLS3Backup.php` once every hour.
+
+3. Set up a single `cron` job to execute `MySQLS3Backup.php` once every hour. Using `crontab`, an example line would be:
+
+   ```
+   0 * * * * php /path/to/mysql-s3-backup/MySQLS3Backup.php
+   ```
 
 The backup files will be created in the format `YYYY-MM-DD_HH-MM-SS.EXT`, where `EXT` is the file extension based on the compression method chosen (`sql` for "None", `gz` for "Gzip", and `bz2` for "Bzip2"). The file names should not be changed inside the bucket, or else the script will not be able to recognize the files.
 
