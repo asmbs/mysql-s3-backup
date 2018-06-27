@@ -17,7 +17,7 @@ class MySQLS3Backup
     public function init()
     {
         // Parse our config file
-        $config = Yaml::parseFile('config.yaml');
+        $config = Yaml::parseFile(dirname(__FILE__) . '/config.yaml');
 
         // Initialize
         $outputter = new Outputter($config);

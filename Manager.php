@@ -79,10 +79,12 @@ class Manager
 
         // Check off each folder that already exists
         $objects = $this->getAllKeysInBucket();
-        foreach ($objects['Contents'] as $object) {
-            $key = str_replace('/', '', $object['Key']);
-            if (in_array($key, self::FOLDERS)) {
-                $checklist[$key] = 1;
+        if($objects->hasKey('Contents')){
+            foreach ($objects['Contents'] as $object) {
+                $key = str_replace('/', '', $object['Key']);
+                if (in_array($key, self::FOLDERS)) {
+                    $checklist[$key] = 1;
+                }
             }
         }
 
@@ -112,7 +114,8 @@ class Manager
             $diff = $this->getTimeDiffFromFileName($newestFileName);
 
             // If it's been more than an hour, then create a new dump.
-            if ($diff >= 3600) {
+            // We use 59 minutes to account for lag time during processing
+            if ($diff >= 60 * 59) {
                 $dumper = new Dumper($this->config, $this->S3Client);
                 $dumper->dump();
             }
