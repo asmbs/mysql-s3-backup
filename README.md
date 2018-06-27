@@ -1,6 +1,6 @@
 # MySQL S3 Backup
 
-*Manages backups of a MySQL database to Amazon S3*
+> Manages backups of a MySQL database to Amazon S3
 
 
 
