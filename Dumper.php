@@ -88,6 +88,9 @@ class Dumper
             $this->config['mysql']['dbname']
         );
         $dumpSettings = ['compress' => self::COMPRESSION_MAP[$this->config['app']['compression']]];
+        if ($this->config['app']['mirror_default_opt'] === true) {
+            $dumpSettings['add-drop-table'] = true;
+        }
 
         try {
             $dump = new IMysqldump\Mysqldump(
