@@ -173,9 +173,9 @@ class Dumper
             case 'None':
                 return 'sql';
             case 'Gzip':
-                return 'gz';
+                return $this->config['app']['add_sql_extension'] === true ? 'sql.gz' : 'gz';
             case 'Bzip2':
-                return 'bz2';
+                return $this->config['app']['add_sql_extension'] === true ? 'sql.bz2' : 'bz2';
         }
         return null;
     }
