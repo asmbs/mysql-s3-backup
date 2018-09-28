@@ -54,4 +54,6 @@ The backup files will be created in the format `YYYY-MM-DD_HH-MM-SS.EXT`, where 
     -   `monthly`
     -   `daily`
     -   `hourly`
+  -  `mirror_default_opt` If set to true, then the dump settings will mirror the default `--opt` [setting](https://dev.mysql.com/doc/refman/5.7/en/mysqldump.html#option_mysqldump_opt) of MySQL's original `mysqldump`.
+  -  `add_sql_extension` If set to true, then `.sql` will be added before the compression extension (e.g. `.gz`) in compressed backups.
 
