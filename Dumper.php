@@ -88,6 +88,9 @@ class Dumper
             $this->config['mysql']['dbname']
         );
         $dumpSettings = ['compress' => self::COMPRESSION_MAP[$this->config['app']['compression']]];
+        if ($this->config['app']['mirror_default_opt'] === true) {
+            $dumpSettings['add-drop-table'] = true;
+        }
 
         try {
             $dump = new IMysqldump\Mysqldump(
@@ -170,9 +173,9 @@ class Dumper
             case 'None':
                 return 'sql';
             case 'Gzip':
-                return 'gz';
+                return $this->config['app']['add_sql_extension'] === true ? 'sql.gz' : 'gz';
             case 'Bzip2':
-                return 'bz2';
+                return $this->config['app']['add_sql_extension'] === true ? 'sql.bz2' : 'bz2';
         }
         return null;
     }

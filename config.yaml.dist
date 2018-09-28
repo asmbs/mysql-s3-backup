@@ -18,3 +18,5 @@ app:
     monthly: 13
     daily: 32
     hourly: 36
+  mirror_default_opt: true
+  add_sql_extension: true
