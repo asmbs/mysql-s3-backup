@@ -3,6 +3,13 @@
     "license": "MIT",
     "description": "Manages backups of a MySQL database to Amazon S3",
     "type": "project",
+    "keywords": [
+        "mysql",
+        "s3",
+        "backup",
+        "mysqldump"
+    ],
+    "homepage": "https://github.com/asmbs/mysql-s3-backup",
     "authors": [
         {
             "name": "Max McMahon",
