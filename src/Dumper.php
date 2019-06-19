@@ -13,7 +13,7 @@ use Ifsnop\Mysqldump as IMysqldump;
  * @package ASMBS\MySQLS3Backup
  * @author Max McMahon <max@asmbs.org>
  */
-class Dumper
+class Dumper extends AbstractS3Backup
 {
     const COMPRESSION_MAP = [
         'None' => IMysqldump\Mysqldump::NONE,
@@ -21,30 +21,11 @@ class Dumper
         'Bzip2' => IMysqldump\Mysqldump::BZIP2
     ];
 
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var S3Client
-     */
-    protected $S3Client;
-
-    /**
-     * @var S3EncryptionClient
-     */
+    /** @var S3EncryptionClient */
     protected $encryptionClient;
 
-    /**
-     * @var EncryptionProvider
-     */
+    /** @var EncryptionProvider */
     protected $encryptionProvider;
-
-    /**
-     * @var Outputter
-     */
-    protected $outputter;
 
     /**
      * Dumper constructor.

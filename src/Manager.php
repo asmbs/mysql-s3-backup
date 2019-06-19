@@ -13,31 +13,14 @@ use Aws\Sns\SnsClient;
  * @package ASMBS\MySQLS3Backup
  * @author Max McMahon <max@asmbs.org>
  */
-class Manager
+class Manager extends AbstractS3Backup
 {
     const FOLDERS = ['yearly', 'monthly', 'daily', 'hourly'];
 
-    /**
-     * @var array
-     */
-    protected $config;
-
-    /**
-     * @var S3Client
-     */
-    protected $S3Client;
-
-    /**
-     * @var Outputter
-     */
-    protected $outputter;
-
-    /**
-     * @var SnsClient
-     */
+    /** @var SnsClient */
     protected $SNSClient;
 
-    /**t
+    /**
      * Manager constructor.
      * @param array $config
      * @param S3Client $S3Client

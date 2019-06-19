@@ -22,14 +22,10 @@ class Outputter
     const COLOR_BROWN = 33;
     const COLOR_LIGHT_GRAY = 37;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $config;
 
-    /**
-     * @var OutputInterface
-     */
+    /** @var OutputInterface */
     protected $outputInterface;
 
     /**
