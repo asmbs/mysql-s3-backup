@@ -41,12 +41,13 @@ class Manager
      * Manager constructor.
      * @param array $config
      * @param S3Client $S3Client
+     * @param Outputter $outputter
      */
-    public function __construct(array $config, S3Client $S3Client)
+    public function __construct(array $config, S3Client $S3Client, Outputter $outputter)
     {
         $this->config = $config;
         $this->S3Client = $S3Client;
-        $this->outputter = new Outputter($config);
+        $this->outputter = $outputter;
     }
 
 
@@ -113,7 +114,7 @@ class Manager
         $allFiles = $this->getAllFileNamesInFolder('hourly');
 
         if (count($allFiles) === 0) {
-            $dumper = new Dumper($this->config, $this->S3Client);
+            $dumper = new Dumper($this->config, $this->S3Client, $this->outputter);
             $dumper->dump();
         } else {
             // Find the most recent hourly backup
@@ -125,7 +126,7 @@ class Manager
             // If it's been more than an hour, then create a new dump.
             // We use 59 minutes to account for lag time during processing
             if ($diff >= 60 * 59) {
-                $dumper = new Dumper($this->config, $this->S3Client);
+                $dumper = new Dumper($this->config, $this->S3Client, $this->outputter);
                 $dumper->dump();
             }
         }

@@ -1,20 +1,27 @@
 <?php
 
-namespace ASMBS\MySQLS3Backup;
+namespace ASMBS\MySQLS3Backup\Command;
 
 require 'vendor/autoload.php';
 
+use ASMBS\MySQLS3Backup\Manager;
+use ASMBS\MySQLS3Backup\Outputter;
 use Aws\S3\S3Client;
 use Aws\Sns\SnsClient;
+use Symfony\Component\Console\Command\Command;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
 
 /**
- * Class MySQLS3Backup
- * @package ASMBS\MySQLS3Backup
+ * Class ManageCommand
+ * @package ASMBS\MySQLS3Backup\Command
  * @author Max McMahon <max@asmbs.org>
  */
-class MySQLS3Backup
+class ManageCommand extends Command
 {
+    protected static $defaultName = 'app:manage';
+
     /**
      * @var SnsClient
      */
@@ -25,18 +32,23 @@ class MySQLS3Backup
      */
     protected $SNSTopicArn;
 
-    public function init()
+    protected function configure()
+    {
+        $this->setDescription('Manages the S3 bucket and creates a dump if necessary.');
+    }
+
+    protected function execute(InputInterface $input, OutputInterface $output)
     {
         // Parse our config file
-        $config = Yaml::parseFile(dirname(__FILE__) . '/config.yaml');
+        $config = Yaml::parseFile(getcwd() . '/config.yaml');
 
         // Initialize
-        $outputter = new Outputter($config);
+        $outputter = new Outputter($config, $output);
         $outputter->output('Initializing...');
         $timeStart = microtime(true);
 
         // Create our S3Client
-        $S3Client = new S3Client($config['s3']);
+        $S3Client = new S3Client($config['s3']['arguments']);
 
         // If there is an Amazon SNS topic configured
         if ($config['sns']['enabled'] === true) {
@@ -47,7 +59,7 @@ class MySQLS3Backup
         }
 
         // See if we need to update
-        $manager = new Manager($config, $S3Client);
+        $manager = new Manager($config, $S3Client, $outputter);
         try {
             $manager->manage();
         } catch (\Exception $e) {
@@ -69,6 +81,3 @@ class MySQLS3Backup
         );
     }
 }
-
-$MySQLS3Backup = new MySQLS3Backup();
-$MySQLS3Backup->init();

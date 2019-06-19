@@ -4,6 +4,8 @@ namespace ASMBS\MySQLS3Backup;
 
 require 'vendor/autoload.php';
 
+use Symfony\Component\Console\Output\OutputInterface;
+
 /**
  * Class Outputter
  * @package ASMBS\MySQLS3Backup
@@ -26,12 +28,19 @@ class Outputter
     protected $config;
 
     /**
+     * @var OutputInterface
+     */
+    protected $outputInterface;
+
+    /**
      * Outputter constructor.
      * @param array $config
+     * @param OutputInterface $outputInterface
      */
-    public function __construct(array $config)
+    public function __construct(array $config, OutputInterface $outputInterface)
     {
         $this->config = $config;
+        $this->outputInterface = $outputInterface;
     }
 
     /**
@@ -43,15 +52,15 @@ class Outputter
     public function output(string $message, int $color = null)
     {
         if ($this->config['app']['output'] === true) {
-            echo ' > ';
+            $this->outputInterface->write(' > ');
             if ($color !== null) {
-                echo "\033[{$color}m";
+                $this->outputInterface->write("\033[{$color}m");
             }
-            echo $message;
+            $this->outputInterface->write($message);
             if ($color != null) {
-                echo "\033[0m";
+                $this->outputInterface->write("\033[0m");
             }
-            echo PHP_EOL;
+            $this->outputInterface->write(PHP_EOL);
         }
     }
 }

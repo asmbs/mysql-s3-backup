@@ -4,6 +4,7 @@ namespace ASMBS\MySQLS3Backup;
 
 require 'vendor/autoload.php';
 
+use Aws\S3\Crypto\S3EncryptionClient;
 use Aws\S3\S3Client;
 use Ifsnop\Mysqldump as IMysqldump;
 
@@ -31,6 +32,16 @@ class Dumper
     protected $S3Client;
 
     /**
+     * @var S3EncryptionClient
+     */
+    protected $encryptionClient;
+
+    /**
+     * @var EncryptionProvider
+     */
+    protected $encryptionProvider;
+
+    /**
      * @var Outputter
      */
     protected $outputter;
@@ -39,12 +50,25 @@ class Dumper
      * Dumper constructor.
      * @param array $config
      * @param S3Client $S3Client
+     * @param Outputter $outputter
      */
-    public function __construct(array $config, S3Client $S3Client)
+    public function __construct(array $config, S3Client $S3Client, Outputter $outputter)
     {
         $this->config = $config;
         $this->S3Client = $S3Client;
-        $this->outputter = new Outputter($config);
+        $this->outputter = $outputter;
+
+        // If client-side encryption is enabled
+        if ($config['s3']['client_encryption']['enabled'] === true) {
+            $this->encryptionClient = new S3EncryptionClient($this->S3Client);
+            $this->encryptionProvider = new EncryptionProvider(
+                $config['s3']['client_encryption']['kms_client']['arguments']['region'],
+                $config['s3']['client_encryption']['kms_client']['arguments']['version'],
+                $config['s3']['client_encryption']['kms_client']['key_arn'],
+                $config['s3']['client_encryption']['kms_client']['cipher_options']['cipher'],
+                $config['s3']['client_encryption']['kms_client']['cipher_options']['key_size']
+            );
+        }
     }
 
 
@@ -116,13 +140,27 @@ class Dumper
         $time = new \DateTime();
         $fileName = sprintf('%s.%s', $time->format('Y-m-d_H-i-s'), $this->getFileExtension());
 
-        $this->S3Client->putObject([
-            'Bucket' => $this->config['app']['bucket'],
-            'Key' => 'hourly/' . $fileName,
-            'SourceFile' => $file->getRealPath(),
-        ]);
-
-        $this->outputter->output('File uploaded successfully!', Outputter::COLOR_GREEN);
+        // If client-side encryption is enabled
+        if ($this->encryptionClient && $this->encryptionProvider) {
+            $this->encryptionClient->putObject(
+                [
+                    '@MaterialsProvider' => $this->encryptionProvider->getMaterialsProvider(),
+                    '@CipherOptions' => $this->encryptionProvider->getCipherOptions(),
+                    'Bucket' => $this->config['app']['bucket'],
+                    'Key' => 'hourly/' . $fileName,
+                    // S3EncryptionClient doesn't support 'SourceFile'; it has to be 'Body'
+                    'Body' => fopen($file->getRealPath(), 'r')
+                ]
+            );
+            $this->outputter->output('File uploaded successfully with encryption!', Outputter::COLOR_GREEN);
+        } else {
+            $this->S3Client->putObject([
+                'Bucket' => $this->config['app']['bucket'],
+                'Key' => 'hourly/' . $fileName,
+                'SourceFile' => $file->getRealPath()
+            ]);
+            $this->outputter->output('File uploaded successfully!', Outputter::COLOR_GREEN);
+        }
     }
 
     /**
