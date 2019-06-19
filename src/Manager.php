@@ -6,41 +6,31 @@ require 'vendor/autoload.php';
 
 use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
+use Aws\Sns\SnsClient;
 
 /**
  * Class Manager
  * @package ASMBS\MySQLS3Backup
  * @author Max McMahon <max@asmbs.org>
  */
-class Manager
+class Manager extends AbstractS3Backup
 {
     const FOLDERS = ['yearly', 'monthly', 'daily', 'hourly'];
 
-    /**
-     * @var array
-     */
-    protected $config;
+    /** @var SnsClient */
+    protected $SNSClient;
 
     /**
-     * @var S3Client
-     */
-    protected $S3Client;
-
-    /**
-     * @var Outputter
-     */
-    protected $outputter;
-
-    /**t
      * Manager constructor.
      * @param array $config
      * @param S3Client $S3Client
+     * @param Outputter $outputter
      */
-    public function __construct(array $config, S3Client $S3Client)
+    public function __construct(array $config, S3Client $S3Client, Outputter $outputter)
     {
         $this->config = $config;
         $this->S3Client = $S3Client;
-        $this->outputter = new Outputter($config);
+        $this->outputter = $outputter;
     }
 
 
@@ -50,6 +40,7 @@ class Manager
     /**
      * Creates new hourly dumps, rolls up to other time periods accordingly, and prunes older dumps when the configured
      * maximums have been reached.
+     * @throws \Exception
      */
     public function manage(): void
     {
@@ -68,6 +59,7 @@ class Manager
 
     /**
      * Create the folders that should exist but do not.
+     * @throws \Exception
      */
     protected function manageFolders(): void
     {
@@ -79,7 +71,7 @@ class Manager
 
         // Check off each folder that already exists
         $objects = $this->getAllKeysInBucket();
-        if($objects->hasKey('Contents')){
+        if ($objects->hasKey('Contents')) {
             foreach ($objects['Contents'] as $object) {
                 $key = str_replace('/', '', $object['Key']);
                 if (in_array($key, self::FOLDERS)) {
@@ -98,13 +90,14 @@ class Manager
 
     /**
      * Manage all of the hourly backups.
+     * @throws \Exception
      */
     protected function manageHourly(): void
     {
         $allFiles = $this->getAllFileNamesInFolder('hourly');
 
         if (count($allFiles) === 0) {
-            $dumper = new Dumper($this->config, $this->S3Client);
+            $dumper = new Dumper($this->config, $this->S3Client, $this->outputter);
             $dumper->dump();
         } else {
             // Find the most recent hourly backup
@@ -116,7 +109,7 @@ class Manager
             // If it's been more than an hour, then create a new dump.
             // We use 59 minutes to account for lag time during processing
             if ($diff >= 60 * 59) {
-                $dumper = new Dumper($this->config, $this->S3Client);
+                $dumper = new Dumper($this->config, $this->S3Client, $this->outputter);
                 $dumper->dump();
             }
         }
@@ -124,6 +117,7 @@ class Manager
 
     /**
      * Manage all of the daily backups.
+     * @throws \Exception
      */
     protected function manageDaily(): void
     {
@@ -147,6 +141,7 @@ class Manager
 
     /**
      * Manage all of the monthly backups.
+     * @throws \Exception
      */
     protected function manageMonthly(): void
     {
@@ -170,6 +165,7 @@ class Manager
 
     /**
      * Manage all of the yearly backups.
+     * @throws \Exception
      */
     protected function manageYearly(): void
     {
@@ -197,6 +193,7 @@ class Manager
 
     /**
      * Prunes for each time period.
+     * @throws \Exception
      */
     protected function pruneAll(): void
     {
@@ -211,6 +208,7 @@ class Manager
      * until the folder is at its maximum.
      *
      * @param string $timePeriod
+     * @throws \Exception
      */
     protected function prune(string $timePeriod): void
     {
@@ -227,6 +225,7 @@ class Manager
 
     /**
      * When a daily backup is needed, this rolls the most recent hourly backup to the 'daily' folder.
+     * @throws \Exception
      */
     protected function rollToDaily()
     {
@@ -250,6 +249,7 @@ class Manager
 
     /**
      * When a monthly backup is needed, this rolls the most recent daily backup to the 'monthly' folder.
+     * @throws \Exception
      */
     protected function rollToMonthly()
     {
@@ -273,6 +273,7 @@ class Manager
 
     /**
      * When a yearly backup is needed, this rolls the most recent monthly backup to the 'yearly' folder.
+     * @throws \Exception
      */
     protected function rollToYearly()
     {
@@ -298,18 +299,14 @@ class Manager
      * Deletes the provided file from the configured bucket.
      *
      * @param string $fileName
+     * @throws \Exception
      */
     protected function deleteFileFromBucket(string $fileName)
     {
-        try {
-            $this->S3Client->deleteObject([
-                'Bucket' => $this->config['app']['bucket'],
-                'Key' => $fileName
-            ]);
-        } catch (AwsException $e) {
-            echo $e->getMessage() . PHP_EOL;
-            return;
-        }
+        $this->S3Client->deleteObject([
+            'Bucket' => $this->config['app']['bucket'],
+            'Key' => $fileName
+        ]);
 
         $this->outputter->output(
             sprintf('File successfully deleted: %s', $fileName),
@@ -322,6 +319,7 @@ class Manager
      *
      * @param string $folderName
      * @return array
+     * @throws \Exception
      */
     protected function getAllFileNamesInFolder(string $folderName): array
     {
@@ -341,19 +339,14 @@ class Manager
      * Returns all the keys in the configured bucket.
      *
      * @return \AWS\Result|null
+     * @throws \Exception
      */
     protected function getAllKeysInBucket(): ?\AWS\Result
     {
-        // List each key in the bucket
-        try {
-            // Get all the keys in the bucket
-            return $this->S3Client->listObjects([
-                'Bucket' => $this->config['app']['bucket']
-            ]);
-        } catch (AwsException $e) {
-            echo $e->getMessage() . PHP_EOL;
-            return null;
-        }
+        // Get all the keys in the bucket
+        return $this->S3Client->listObjects([
+            'Bucket' => $this->config['app']['bucket']
+        ]);
     }
 
     /**
@@ -361,19 +354,15 @@ class Manager
      *
      * @param string $folderName
      * @return null|void
+     * @throws \Exception
      */
     protected function createFolder(string $folderName)
     {
-        try {
-            $this->S3Client->putObject([
-                'Bucket' => $this->config['app']['bucket'],
-                'Key' => $folderName . '/',
-                'Body' => ''
-            ]);
-        } catch (AwsException $e) {
-            echo $e->getMessage() . PHP_EOL;
-            return null;
-        }
+        $this->S3Client->putObject([
+            'Bucket' => $this->config['app']['bucket'],
+            'Key' => $folderName . '/',
+            'Body' => ''
+        ]);
 
         $this->outputter->output(
             sprintf('Folder successfully created: %s', $folderName),
@@ -398,6 +387,7 @@ class Manager
     /**
      * @param string $fileName
      * @return int
+     * @throws \Exception
      */
     protected function getTimeDiffFromFileName(string $fileName): int
     {

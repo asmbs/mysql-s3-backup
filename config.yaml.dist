@@ -1,9 +1,32 @@
 s3:
-  version: 'latest'
-  region: 'us-east-1'
-  credentials:
-    key: ''
-    secret: ''
+  arguments:
+    version: 'latest'
+    region: 'us-east-1'
+    credentials:
+      key: ''
+      secret: ''
+  client_encryption:
+    enabled: true
+    kms_client:
+      arguments:
+        version: 'latest'
+        region: 'us-east-1'
+        credentials:
+          key: ''
+          secret: ''
+      key_arn: ''
+      cipher_options:
+        cipher: 'gcm'
+        key_size: 256
+sns:
+  enabled: false
+  arguments:
+    version: 'latest'
+    region: 'us-east-1'
+    credentials:
+      key: ''
+      secret: ''
+  topic_arn: ''
 mysql:
   host: 'localhost'
   dbname: ''
