@@ -21,7 +21,7 @@
         "php": ">=7.2",
         "aws/aws-sdk-php": "^3.61",
         "symfony/yaml": "^4.1",
-        "ifsnop/mysqldump-php": "2.*"
+        "ifsnop/mysqldump-php": "^2.7"
     },
     "autoload": {
         "psr-4": {
