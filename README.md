@@ -39,15 +39,25 @@ The backup files will be created in the format `YYYY-MM-DD_HH-MM-SS.EXT`, where 
 - `s3`
   -  `version` The S3 version to use
   -  `region` The S3 region to use
-  -  `key` Your S3 key
-  -  `secret` Your S3 secret
+  -  `credentials`
+     -  `key` Your S3 key
+     -  `secret` Your S3 secret
+- `sns`
+  - `enabled` If set to true, then exceptions will be sent to an Amazon SNS Topic. If set to false, exceptions will simply be outputted.
+  - `arguments`
+    -  `version`
+    - `region`
+    - `credentials`
+      - `key`
+      - `secret`
+  - `topic_arn` The ARN of the Amazon SNS Topic to use. Typically, this will begin with "arn:aws:sns".
 - `mysql`
   -  `host` The host on which your database is hosted
   -  `dbname` The name of your database
   -  `username` The username to be used by MySQL
   -  `password` The password to be used by MySQL
 - `app`
-  -  `output` If set to true, then information will be outputted. If set to false, the script will run silently.
+  -  `output` If set to true, then information will be outputted. If set to false, the script will run silently (except for exceptions).
   -  `compression` The compression algorithm to use. This should be 'None', 'Gzip', or 'Bzip2'. Note that bzip2 support is [not enabled by default in PHP](http://php.net/manual/en/bzip2.installation.php).
   -  `maximum_backup_counts` This is the maximum number of backups to keep based on each time period. For example, setting 'yearly' to '7' will keep **one** backup for each of the past 7 years. When a day rolls over, the most recent 'hourly' backup will be used.
     -   `yearly`
