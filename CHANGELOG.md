@@ -10,6 +10,20 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 
 
+## [2.0.0] - 2019-06-19
+
+### Added
+
+- Support for Amazon SNS for alerting of exceptions.
+- Support for uploading and downloading with client-side encryption with an AWS KMS-managed customer master key.
+
+### Changed
+
+- **[BC Break]** Changed the program structure to work as a set of Symfony Commands (so `crontab` configurations have to be altered slightly).
+- Updated dependencies.
+
+
+
 ## [1.1.0] - 2018-09-28
 
 ### Added
