@@ -4,7 +4,6 @@ namespace ASMBS\MySQLS3Backup;
 
 require 'vendor/autoload.php';
 
-use Aws\Exception\AwsException;
 use Aws\S3\S3Client;
 use Ifsnop\Mysqldump as IMysqldump;
 
@@ -54,6 +53,7 @@ class Dumper
 
     /**
      * Creates a dump of the MySQL database.
+     * @throws \Exception
      */
     public function dump()
     {
@@ -76,6 +76,7 @@ class Dumper
 
     /**
      * Creates the dump file at a temporary file location.
+     * @throws \Exception
      */
     protected function createDump()
     {
@@ -92,19 +93,13 @@ class Dumper
             $dumpSettings['add-drop-table'] = true;
         }
 
-        try {
-            $dump = new IMysqldump\Mysqldump(
-                $dsn,
-                $this->config['mysql']['username'],
-                $this->config['mysql']['password'],
-                $dumpSettings
-            );
-            $dump->start($file->getRealPath());
-
-        } catch (\Exception $e) {
-            echo 'mysqldump-php error: ' . $e->getMessage();
-            return null;
-        }
+        $dump = new IMysqldump\Mysqldump(
+            $dsn,
+            $this->config['mysql']['username'],
+            $this->config['mysql']['password'],
+            $dumpSettings
+        );
+        $dump->start($file->getRealPath());
 
         $this->outputter->output('Dump created successfully!', Outputter::COLOR_GREEN);
         return $file;
@@ -112,6 +107,7 @@ class Dumper
 
     /**
      * @param \SplFileInfo $file
+     * @throws \Exception
      */
     protected function uploadDump($file)
     {
@@ -120,16 +116,11 @@ class Dumper
         $time = new \DateTime();
         $fileName = sprintf('%s.%s', $time->format('Y-m-d_H-i-s'), $this->getFileExtension());
 
-        try {
-            $this->S3Client->putObject([
-                'Bucket' => $this->config['app']['bucket'],
-                'Key' => 'hourly/' . $fileName,
-                'SourceFile' => $file->getRealPath(),
-            ]);
-        } catch (AwsException $e) {
-            echo 'AWS error: ' . $e->getMessage();
-            return;
-        }
+        $this->S3Client->putObject([
+            'Bucket' => $this->config['app']['bucket'],
+            'Key' => 'hourly/' . $fileName,
+            'SourceFile' => $file->getRealPath(),
+        ]);
 
         $this->outputter->output('File uploaded successfully!', Outputter::COLOR_GREEN);
     }

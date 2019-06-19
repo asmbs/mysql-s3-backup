@@ -5,6 +5,7 @@ namespace ASMBS\MySQLS3Backup;
 require 'vendor/autoload.php';
 
 use Aws\S3\S3Client;
+use Aws\Sns\SnsClient;
 use Symfony\Component\Yaml\Yaml;
 
 /**
@@ -14,6 +15,16 @@ use Symfony\Component\Yaml\Yaml;
  */
 class MySQLS3Backup
 {
+    /**
+     * @var SnsClient
+     */
+    protected $SNSClient;
+
+    /**
+     * @var string
+     */
+    protected $SNSTopicArn;
+
     public function init()
     {
         // Parse our config file
@@ -27,9 +38,28 @@ class MySQLS3Backup
         // Create our S3Client
         $S3Client = new S3Client($config['s3']);
 
+        // If there is an Amazon SNS topic configured
+        if ($config['sns']['enabled'] === true) {
+            // Create our SNSClient
+            $this->SNSClient = new SnsClient($config['sns']['arguments']);
+            // Set the variable
+            $this->SNSTopicArn = $config['sns']['topic_arn'];
+        }
+
         // See if we need to update
         $manager = new Manager($config, $S3Client);
-        $manager->manage();
+        try {
+            $manager->manage();
+        } catch (\Exception $e) {
+            if ($this->SNSClient) {
+                $this->SNSClient->publish([
+                    'Message' => $e->__toString(),
+                    'TopicArn' => $this->SNSTopicArn
+                ]);
+            } else {
+                echo $e->__toString();
+            }
+        }
 
         $timeEnd = microtime(true);
         $outputter->output('Exiting.');

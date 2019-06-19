@@ -4,6 +4,15 @@ s3:
   credentials:
     key: ''
     secret: ''
+sns:
+  enabled: false
+  arguments:
+    version: 'latest'
+    region: 'us-east-1'
+    credentials:
+      key: ''
+      secret: ''
+  topic_arn: ''
 mysql:
   host: 'localhost'
   dbname: ''
