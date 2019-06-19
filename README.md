@@ -27,21 +27,50 @@
 4. Set up a single `cron` job to execute `MySQLS3Backup.php` once every hour. Using `crontab`, an example line would be:
 
    ```
-   0 * * * * php /path/to/mysql-s3-backup/MySQLS3Backup.php
+   0 * * * * php /path/to/mysql-s3-backup/src/MySQLS3Backup.php app:manage
    ```
 
 The backup files will be created in the format `YYYY-MM-DD_HH-MM-SS.EXT`, where `EXT` is the file extension based on the compression method chosen (`sql` for "None", `gz` for "Gzip", and `bz2` for "Bzip2"). The file names should not be changed inside the bucket, or else the script will not be able to recognize the files.
 
 
 
+## Usage
+
+You can manually execute the "manage" command by running:
+
+```
+php src/MySQLS3Backup.php app:manage
+```
+
+To download a previous dump that was uploaded using client-side encryption, it must be downloaded with the "download-encrypted" command. You can do this by running:
+
+```
+php src/MySQLS3Backup.php app:download-encrypted "hourly/2019-06-19_16-07-24.sql.gz" --output-file="/var/tmp/bar.sql.gz"
+```
+
+
+
 ## Configuration Reference
 
 - `s3`
-  -  `version` The S3 version to use
-  -  `region` The S3 region to use
-  -  `credentials`
-     -  `key` Your S3 key
-     -  `secret` Your S3 secret
+  - `arguments`
+    - `version` The S3 version to use
+    - `region` The S3 region to use
+    - `credentials`
+      - `key` Your S3 key
+      - `secret` Your S3 secret
+  - `client_encryption`
+    - `enabled` If set to true, then dump files will be transferred to S3 using client-side encryption with an AWS KMS-managed customer master key. If set to false, then plain non-encrypted transfer will be used.
+      - `arguments`
+        - `version` 
+        - `region` 
+        - `credentials`
+          - `key` 
+          - `secret` 
+      - `key_arn` The ARN of the KMS-managed customer key to use. Typically, this will begin with "arn:aws:kms".
+      - `cipher_options`
+        - Should be "cbc" or "gcm". See AWS PHP SDK documentation.
+        - Should be "128", "192", or "256". See AWS PHP SDK documentation.
 - `sns`
   - `enabled` If set to true, then exceptions will be sent to an Amazon SNS Topic. If set to false, exceptions will simply be outputted.
   - `arguments`
