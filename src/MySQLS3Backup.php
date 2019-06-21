@@ -2,7 +2,7 @@
 
 namespace ASMBS\MySQLS3Backup;
 
-require 'vendor/autoload.php';
+require __DIR__ . '/../vendor/autoload.php';
 
 use ASMBS\MySQLS3Backup\Command\DownloadEncryptedDumpCommand;
 use ASMBS\MySQLS3Backup\Command\ManageCommand;

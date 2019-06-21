@@ -2,7 +2,7 @@
 
 namespace ASMBS\MySQLS3Backup\Command;
 
-require 'vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 use ASMBS\MySQLS3Backup\Manager;
 use Symfony\Component\Console\Input\InputInterface;
