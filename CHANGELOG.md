@@ -10,6 +10,14 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 
 
+## [2.0.1] - 2019-06-21
+
+### Fixed
+
+- Autoload locations.
+
+
+
 ## [2.0.0] - 2019-06-19
 
 ### Added
