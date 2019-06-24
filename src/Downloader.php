@@ -49,7 +49,7 @@ class Downloader extends AbstractS3Backup
             throw new \Exception('Client encryption is not enabled.');
         }
 
-        $filePath = $outputFile ?? getcwd() . '/' . str_replace('/', '-', $key);
+        $filePath = $outputFile ?? __DIR__ . '/../' . str_replace('/', '-', $key);
 
         $getResult = $this->encryptionClient->getObject(
             [

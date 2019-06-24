@@ -44,7 +44,7 @@ abstract class AbstractCommand extends Command
     protected function begin(OutputInterface $output)
     {
         // Parse our config file
-        $this->config = Yaml::parseFile(getcwd() . '/config.yaml');
+        $this->config = Yaml::parseFile(__DIR__ . '/../../config.yaml');
 
         // Initialize
         $this->outputter = new Outputter($this->config, $output);
