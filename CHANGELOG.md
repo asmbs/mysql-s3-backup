@@ -10,6 +10,14 @@ This project adheres to [Semantic Versioning](http://semver.org/spec/v2.0.0.html
 
 
 
+## [2.0.2] - 2019-06-24
+
+### Fixed
+
+- The relative `config.yaml` location.
+
+
+
 ## [2.0.1] - 2019-06-21
 
 ### Fixed
