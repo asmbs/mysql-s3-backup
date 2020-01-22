@@ -20,22 +20,24 @@ class EncryptionProvider
     /** @var array */
     protected $cipherOptions;
 
-    /**
-     * EncryptionProvider constructor.
-     *
-     * @param string $s3Region
-     * @param string $s3Version
-     * @param string $kmsKeyARN
-     * @param string $cipher
-     * @param int $keySize
-     */
-    public function __construct(string $s3Region, string $s3Version, string $kmsKeyARN, string $cipher, int $keySize)
+	/**
+	 * EncryptionProvider constructor.
+	 *
+	 * @param string $s3Region
+	 * @param string $s3Version
+	 * @param array $credentials
+	 * @param string $kmsKeyARN
+	 * @param string $cipher
+	 * @param int $keySize
+	 */
+    public function __construct(string $s3Region, string $s3Version, array $credentials, string $kmsKeyARN, string $cipher, int $keySize)
     {
         $this->materialsProvider = new KmsMaterialsProvider(
             new KmsClient(
                 [
                     'region' => $s3Region,
                     'version' => $s3Version,
+	                'credentials' => $credentials
                 ]
             ),
             $kmsKeyARN
