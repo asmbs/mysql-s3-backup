@@ -45,6 +45,7 @@ class Dumper extends AbstractS3Backup
             $this->encryptionProvider = new EncryptionProvider(
                 $config['s3']['client_encryption']['kms_client']['arguments']['region'],
                 $config['s3']['client_encryption']['kms_client']['arguments']['version'],
+	            $config['s3']['client_encryption']['kms_client']['arguments']['credentials'],
                 $config['s3']['client_encryption']['kms_client']['key_arn'],
                 $config['s3']['client_encryption']['kms_client']['cipher_options']['cipher'],
                 $config['s3']['client_encryption']['kms_client']['cipher_options']['key_size']
