@@ -41,6 +41,7 @@ class Downloader extends AbstractS3Backup
             $this->encryptionProvider = new EncryptionProvider(
                 $this->config['s3']['client_encryption']['kms_client']['arguments']['region'],
                 $this->config['s3']['client_encryption']['kms_client']['arguments']['version'],
+                $this->config['s3']['client_encryption']['kms_client']['arguments']['credentials'],
                 $this->config['s3']['client_encryption']['kms_client']['key_arn'],
                 $this->config['s3']['client_encryption']['kms_client']['cipher_options']['cipher'],
                 $this->config['s3']['client_encryption']['kms_client']['cipher_options']['key_size']
